@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#05090b" />
+  <meta name="description" content="VOIDLINE — a first-person survival trial on a 3×3 plot of land floating over an endless void. Fish the dark, build your island, survive the seventh day." />
+  <title>VOIDLINE — A Void Survival Trial</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23050b0d'/%3E%3Cpath d='M14 48 46 16M44 16c9 0 10 10 4 15M32 44c3 4 8 4 10 0' stroke='%2374f0c8' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <script type="module" crossorigin src="./assets/index-B8A_kR_w.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-ByAlqxq4.css">
+</head>
+<body>
+  <canvas id="game"></canvas>
+  <div id="vignette"></div>
+  <div id="grain"></div>
+
+  <!-- ================================================================== -->
+  <!-- START SCREEN                                                        -->
+  <!-- ================================================================== -->
+  <section id="start-screen">
+    <div class="start-grid">
+      <div class="start-copy">
+        <div class="start-brand">
+          <span class="mark"><i></i></span>
+          <span>OMG SIMULATION LAB</span>
+          <span class="dot"></span>
+          <span>BUILD 07</span>
+        </div>
+        <p class="kicker">A real-time survival trial</p>
+        <h1>VOID<span>LINE</span></h1>
+        <p class="lede">You wake on <strong>nine flagstones of borrowed earth</strong>. Below and beyond: nothing. In your hands: one fishing rod. The simulation is generous, if you dare cast into the dark.</p>
+        <div class="start-facts">
+          <div><span>01</span><b>Cast</b><em>Pull caches from the void</em></div>
+          <div><span>02</span><b>Build</b><em>Expand your plot, plant light</em></div>
+          <div><span>03</span><b>Survive</b><em>Hold out for seven days, then face the trial</em></div>
+        </div>
+        <div class="start-actions">
+          <button id="start-btn" class="primary-btn"><span>Enter the simulation</span><i data-icon="arrow"></i></button>
+          <button id="continue-btn" class="ghost-btn hidden"><span>Continue session</span><small id="continue-detail">Day 1</small></button>
+        </div>
+        <div class="start-controls">
+          <span class="kbd-hint"><kbd>WASD</kbd> move</span><span class="kbd-hint"><kbd>Look</kbd> mouse / drag</span><span class="kbd-hint"><kbd>Space</kbd> cast · reel · act</span><span class="kbd-hint"><kbd>B</kbd> backpack</span>
+          <span class="touch-hint">Left stick move</span><span class="touch-hint">Drag to look</span><span class="touch-hint">Action button: cast · reel · act</span>
+        </div>
+        <p class="start-note">Headphones recommended. Runs best in landscape. Progress saves automatically.</p>
+      </div>
+      <div class="start-aside">
+        <div class="sim-card">
+          <div class="sim-head"><span class="pulse"></span> SIMULATION ACTIVE</div>
+          <div class="sim-row"><span>PLOT</span><b>3 × 3</b></div>
+          <div class="sim-row"><span>GRACE PERIOD</span><b>7 days</b></div>
+          <div class="sim-row"><span>BACKPACK</span><b>10 slots</b></div>
+          <div class="sim-row"><span>INHABITANTS</span><b>you</b></div>
+          <div class="sim-footer"><span class="bar"></span> SIGNAL STABLE</div>
+        </div>
+        <div class="aside-quote">“The void is not empty.<br />It is <em>waiting.</em>”</div>
+      </div>
+    </div>
+    <div class="start-foot">
+      <span>OMG / SURVIVAL PROTOCOL 07</span>
+      <span>Tap to begin · saves locally</span>
+    </div>
+  </section>
+
+  <!-- ================================================================== -->
+  <!-- HUD                                                                 -->
+  <!-- ================================================================== -->
+  <main id="hud" class="hidden" aria-live="polite">
+    <header id="topbar">
+      <div class="brand">
+        <span class="mark"><i></i></span>
+        <span class="brand-name">VOIDLINE<small>SIM // 07</small></span>
+      </div>
+      <div id="trial-pill" class="trial-pill">
+        <div class="trial-top"><span id="trial-label">TRIAL IN</span><b id="trial-days">7 DAYS</b></div>
+        <div class="trial-track"><i id="trial-fill"></i></div>
+      </div>
+      <div class="top-right">
+        <div class="clock-card">
+          <span id="clock-time">06:00</span>
+          <small id="clock-day">DAY 1 / 7</small>
+        </div>
+        <button class="icon-btn" id="sound-btn" data-icon="sound" title="Sound"></button>
+        <button class="icon-btn" id="settings-btn" data-icon="gear" title="Settings"></button>
+      </div>
+    </header>
+
+    <div id="objective-panel" class="objective-panel">
+      <div class="obj-head"><span>TRIAL PREP</span><b id="obj-progress">0 / 5</b></div>
+      <div id="obj-title" class="obj-title">Cast into the void</div>
+      <div id="obj-sub" class="obj-sub">Aim past the edge of your plot and press <kbd>Space</kbd>.</div>
+      <div id="obj-list" class="obj-list"></div>
+    </div>
+
+    <div id="reticle">
+      <span class="ret-dot"></span>
+      <span id="ret-label" class="ret-label"></span>
+    </div>
+
+    <div id="hint-strip" class="hint-strip"><span id="hint-text">Drag to look · tap ACTION to cast</span></div>
+
+    <div id="vitals" class="vitals">
+      <div class="vital" data-vital="health"><span class="v-icon">HP</span><div class="v-track"><i></i></div><b id="hp-value">100</b></div>
+      <div class="vital" data-vital="hunger"><span class="v-icon">FD</span><div class="v-track"><i></i></div><b id="food-value">100</b></div>
+      <div class="vital" data-vital="thirst"><span class="v-icon">H2O</span><div class="v-track"><i></i></div><b id="water-value">100</b></div>
+      <div class="vital energy" data-vital="energy"><span class="v-icon">EN</span><div class="v-track"><i></i></div><b id="energy-value">100</b></div>
+    </div>
+
+    <div id="hotbar" class="hotbar"></div>
+
+    <div id="action-cluster" class="action-cluster">
+      <div id="cast-readout" class="cast-readout hidden"><span id="cast-state">CASTING</span><i><b id="cast-fill"></b></i></div>
+      <button id="inventory-btn" class="round-btn small" data-icon="bag" title="Backpack (B)"></button>
+      <button id="craft-btn" class="round-btn small" data-icon="hammer" title="Fabricator (C)"></button>
+      <button id="action-btn" class="round-btn action"><span id="action-icon" data-icon="cast"></span><b id="action-label">CAST</b><small id="action-sub">into the void</small></button>
+    </div>
+
+    <div id="joystick" class="joystick hidden"><div class="stick-base"><div class="stick-knob"></div></div><span>MOVE</span></div>
+
+    <div id="boss-bar" class="boss-bar hidden">
+      <div class="boss-head"><span id="boss-name">THE HOLLOW HERALD</span><b id="boss-hp">340 / 340</b></div>
+      <div class="boss-track"><i id="boss-fill"></i></div>
+    </div>
+
+    <div id="bite-banner" class="bite-banner hidden"><span>!</span> REEL NOW</div>
+    <div id="banner" class="banner hidden"><small id="banner-kicker">SYSTEM</small><strong id="banner-title">Welcome</strong><span id="banner-sub"></span></div>
+    <div id="toast-stack" class="toast-stack"></div>
+    <div id="interact-prompt" class="interact-prompt hidden"><kbd>E</kbd><span id="interact-label">Interact</span></div>
+    <div id="look-hint" class="look-hint hidden">Click to look around</div>
+    <div id="danger-vignette"></div>
+    <div id="hit-flash"></div>
+  </main>
+
+  <!-- ================================================================== -->
+  <!-- PANELS                                                              -->
+  <!-- ================================================================== -->
+  <section id="inventory-panel" class="side-panel hidden">
+    <div class="panel-head">
+      <div><p class="eyebrow">FIELD KIT</p><h2>Backpack</h2></div>
+      <button class="icon-btn close" data-close="inventory" data-icon="close"></button>
+    </div>
+    <div class="inv-meta">
+      <span id="inv-count">0 / 10 slots</span>
+      <span id="inv-level">Level 1</span>
+    </div>
+    <div id="inv-grid" class="inv-grid"></div>
+    <div id="inv-detail" class="inv-detail">
+      <span class="empty-hint">Select an item to inspect it.</span>
+    </div>
+    <div class="panel-foot"><span>Backpack grows at level 10, 20, 30…</span><span id="inv-xp">0 / 80 XP</span></div>
+  </section>
+
+  <section id="craft-panel" class="side-panel hidden">
+    <div class="panel-head">
+      <div><p class="eyebrow">FIELD FABRICATOR</p><h2>Make</h2></div>
+      <button class="icon-btn close" data-close="craft" data-icon="close"></button>
+    </div>
+    <p class="panel-intro">The simulation converts spare matter into tools. No bench required.</p>
+    <div id="recipe-list" class="recipe-list"></div>
+    <div class="panel-foot"><span>Gather materials from void caches and lumenwood trees.</span></div>
+  </section>
+
+  <section id="settings-panel" class="modal-card settings hidden">
+    <div class="panel-head">
+      <div><p class="eyebrow">SYSTEM</p><h2>Settings</h2></div>
+      <button class="icon-btn close" data-close="settings" data-icon="close"></button>
+    </div>
+    <label class="setting-row"><span>Look sensitivity</span><input id="sens-range" type="range" min="0.5" max="2" step="0.1" value="1" /><b id="sens-val">1.0×</b></label>
+    <label class="setting-row"><span>Master volume</span><input id="vol-range" type="range" min="0" max="1" step="0.05" value="0.6" /><b id="vol-val">60%</b></label>
+    <div class="setting-row"><span>Show tutorial hints</span><button id="hint-toggle" class="toggle on"><i></i></button></div>
+    <div class="setting-actions">
+      <button id="save-btn" class="ghost-btn small-btn">Save now</button>
+      <button id="reset-btn" class="danger-btn small-btn">Reset simulation</button>
+    </div>
+    <p class="credit">VOIDLINE · built for the OMG simulation trial. No external assets.</p>
+  </section>
+
+  <section id="loot-overlay" class="overlay hidden">
+    <div class="loot-card">
+      <div class="loot-head"><p class="eyebrow">VOID CACHE</p><h2 id="loot-title">Cache opened</h2><span id="loot-rarity" class="rarity-chip">RARE</span></div>
+      <div id="loot-items" class="loot-items"></div>
+      <button id="loot-close" class="primary-btn compact"><span>Stow all</span><i data-icon="arrow"></i></button>
+      <p class="loot-note" id="loot-note">Items added to your backpack.</p>
+    </div>
+  </section>
+
+  <section id="death-overlay" class="overlay death hidden">
+    <div class="end-card">
+      <div class="end-glow"></div>
+      <p class="eyebrow">SIGNAL LOST</p>
+      <h2>THE VOID<br />REMEMBERS YOU.</h2>
+      <p id="death-text">Your body failed. The simulation can print another.</p>
+      <div class="end-stats" id="death-stats"></div>
+      <button id="respawn-btn" class="primary-btn"><span>Reconstruct</span><i data-icon="arrow"></i></button>
+      <button id="death-reset" class="text-btn">Reset simulation instead</button>
+    </div>
+  </section>
+
+  <section id="victory-overlay" class="overlay victory hidden">
+    <div class="end-card">
+      <div class="end-glow gold"></div>
+      <p class="eyebrow">TRIAL COMPLETE</p>
+      <h2>THE HERALD<br /><span>FALLS SILENT.</span></h2>
+      <p>You survived the seventh day. The void pulls back its teeth. Somewhere beyond the simulation, a door unlocks.</p>
+      <div class="end-stats" id="victory-stats"></div>
+      <button id="victory-btn" class="primary-btn"><span>Keep surviving</span><i data-icon="arrow"></i></button>
+      <button id="victory-reset" class="text-btn">Start a new simulation</button>
+    </div>
+  </section>
+
+  <div id="rotate-note" class="rotate-note hidden"><span>↻</span> Turn your device for a wider view</div>
+  <div id="lock-overlay" class="lock-overlay hidden"><span>Click to look around</span><small>ESC releases the mouse</small></div>
+
+</body>
+</html>
