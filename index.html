@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#f6f2e7" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <title>Little Field Day — a pocket park adventure</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div class="brand-mark" aria-hidden="true"><span>✿</span></div>
+      <div class="brand-copy"><div class="eyebrow">A POCKET PARK ADVENTURE</div><h1>Little Field Day</h1></div>
+      <button class="icon-button journal-button" id="journalButton" aria-label="Open field journal"><span>▤</span><i id="journalCount">0</i></button>
+    </header>
+
+    <section class="game-wrap" aria-label="Explore the park">
+      <canvas id="game" aria-label="A little park to explore. Use the controls to walk around."></canvas>
+      <div class="scene-vignette"></div>
+      <div class="scene-topline"><div class="weather-pill"><span>☀</span> <b>Sunny</b><span class="dot">·</span> 18°</div><div class="time-pill"><span>◷</span> 10:24 AM</div></div>
+      <div class="quest-card" id="questCard">
+        <div class="quest-heading"><span class="quest-flower">✿</span><div><small>TODAY'S LITTLE MISSION</small><strong>Make the park bloom</strong></div><button id="questToggle" aria-label="Collapse mission">⌃</button></div>
+        <div class="quest-list" id="questList"></div>
+      </div>
+      <div class="toast" id="toast" aria-live="polite"></div>
+      <div class="interaction-hint" id="interactionHint"><span class="hint-key">E</span><span id="hintText">Say hello</span></div>
+      <div class="bottom-controls">
+        <div class="joystick" id="joystick" aria-label="Movement joystick"><div class="joy-ring"><div class="joy-knob" id="joyKnob"></div></div><span class="joy-label">MOVE</span></div>
+        <div class="control-tip"><span>WANDER AT YOUR OWN PACE</span><span>Tap the path to walk</span></div>
+        <button class="action-button" id="actionButton" aria-label="Interact" disabled><span class="action-icon">✧</span><span id="actionLabel">LOOK<br>AROUND</span></button>
+      </div>
+      <div class="mobile-hint" id="mobileHint">Drag the little stick or tap anywhere to wander</div>
+    </section>
+    <footer class="footer"><span><i class="status-dot"></i> A quiet morning in Maplewood Park</span><button id="soundButton" aria-label="Toggle sound">♫ <span>Sound on</span></button></footer>
+  </main>
+
+  <div class="modal-backdrop" id="modalBackdrop" hidden>
+    <section class="journal-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="close-button" id="closeModal" aria-label="Close journal">×</button>
+      <div class="modal-stamp">YOUR FIELD NOTES · DAY 01</div>
+      <h2 id="modalTitle">Pocket journal</h2>
+      <p class="modal-intro">A little record of the things you noticed today.</p>
+      <div class="journal-tabs"><button class="tab active" data-tab="discoveries">Discoveries <span id="tabDiscoveries">0</span></button><button class="tab" data-tab="postcards">Postcards <span>1</span></button></div>
+      <div class="journal-content" id="journalContent"></div>
+    </section>
+  </div>
+  <div class="completion-backdrop" id="completionBackdrop" hidden>
+    <section class="completion-card"><div class="completion-art">🌼</div><div class="modal-stamp">MAPLEWOOD PARK · 10:42 AM</div><h2>A lovely little day.</h2><p>You made room for more wildflowers, met a new friend, and left the park a bit brighter.</p><div class="completion-stats"><span><b id="finishPlants">3</b> wild finds</span><span><b id="finishLitter">2</b> bits recycled</span></div><button class="primary-button" id="keepExploring">Keep exploring <span>→</span></button></section>
+  </div>
+  <script src="game.js"></script>
+</body>
+</html>
